@@ -1,29 +1,29 @@
 import { Category, TradeLot, Order, ChatMessage, Wallet, User } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/$/, '') : '') + '/api';
 
-export const apiClient = {
+class ApiClient {
   getToken(): string | null {
     return localStorage.getItem('cyfrahub_token');
-  },
+  }
 
-  setToken(token: string) {
+  setToken(token: string): void {
     localStorage.setItem('cyfrahub_token', token);
-  },
+  }
 
-  clearToken() {
+  clearToken(): void {
     localStorage.removeItem('cyfrahub_token');
     localStorage.removeItem('cyfrahub_user');
-  },
+  }
 
   getUser(): User | null {
     const raw = localStorage.getItem('cyfrahub_user');
     return raw ? JSON.parse(raw) : null;
-  },
+  }
 
-  setUser(user: User) {
+  setUser(user: User): void {
     localStorage.setItem('cyfrahub_user', JSON.stringify(user));
-  },
+  }
 
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = this.getToken();
@@ -47,7 +47,7 @@ export const apiClient = {
     }
 
     return res.json();
-  },
+  }
 
   // Auth
   async login(email: string, password: string): Promise<User> {
@@ -60,7 +60,7 @@ export const apiClient = {
       this.setUser(data);
     }
     return data;
-  },
+  }
 
   async register(email: string, password: string, username: string, telegramUsername?: string): Promise<User> {
     const data = await this.request<User>('/auth/register', {
@@ -72,7 +72,7 @@ export const apiClient = {
       this.setUser(data);
     }
     return data;
-  },
+  }
 
   // Catalog
   async getCategories(): Promise<Category[]> {
@@ -81,7 +81,7 @@ export const apiClient = {
     } catch {
       return getMockCategories();
     }
-  },
+  }
 
   async getLotsByGame(gameId: number): Promise<TradeLot[]> {
     try {
@@ -89,7 +89,7 @@ export const apiClient = {
     } catch {
       return getMockLots(gameId);
     }
-  },
+  }
 
   // Orders & Escrow
   async createOrder(lotId: number, amount: number): Promise<Order> {
@@ -97,54 +97,54 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify({ lotId, amount })
     });
-  },
+  }
 
   async getBuyerOrders(): Promise<Order[]> {
     return await this.request<Order[]>('/orders/buyer');
-  },
+  }
 
   async getOrder(orderId: number): Promise<Order> {
     return await this.request<Order>(`/orders/${orderId}`);
-  },
+  }
 
   async markTransferred(orderId: number): Promise<Order> {
     return await this.request<Order>(`/orders/${orderId}/transfer`, { method: 'POST' });
-  },
+  }
 
   async confirmOrder(orderId: number): Promise<Order> {
     return await this.request<Order>(`/orders/${orderId}/confirm`, { method: 'POST' });
-  },
+  }
 
   async openDispute(orderId: number, reason: string): Promise<Order> {
     return await this.request<Order>(`/orders/${orderId}/dispute`, {
       method: 'POST',
       body: JSON.stringify({ reason })
     });
-  },
+  }
 
   // Chat
   async getMessages(orderId: number): Promise<ChatMessage[]> {
     return await this.request<ChatMessage[]>(`/orders/${orderId}/chat`);
-  },
+  }
 
   async sendMessage(orderId: number, message: string): Promise<ChatMessage> {
     return await this.request<ChatMessage>(`/orders/${orderId}/chat`, {
       method: 'POST',
       body: JSON.stringify({ message })
     });
-  },
+  }
 
   // Wallet
   async getWallet(): Promise<Wallet> {
     return await this.request<Wallet>('/wallet');
-  },
+  }
 
   async deposit(amount: number): Promise<Wallet> {
     return await this.request<Wallet>('/wallet/deposit', {
       method: 'POST',
       body: JSON.stringify({ amount })
     });
-  },
+  }
 
   async withdraw(amount: number, cardNumber: string, cardHolderName: string): Promise<Wallet> {
     return await this.request<Wallet>('/wallet/withdraw', {
@@ -152,7 +152,9 @@ export const apiClient = {
       body: JSON.stringify({ amount, cardNumber, cardHolderName })
     });
   }
-};
+}
+
+export const apiClient = new ApiClient();
 
 // Mock Fallback Data (When Backend is offline or for instant preview)
 function getMockCategories(): Category[] {
