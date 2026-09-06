@@ -1,0 +1,63 @@
+{
+  "brand": {
+    "name": "CyfraHub",
+    "tagline": "Your trusted digital & gaming exchange"
+  },
+  "nav": {
+    "catalog": "Game Catalog",
+    "software": "Software & Keys",
+    "escrow": "Escrow Protection",
+    "orders": "My Orders",
+    "wallet": "Wallet",
+    "sell": "Sell Item",
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Sign Out"
+  },
+  "search": {
+    "placeholder": "Search game, product, key or service...",
+    "all_categories": "All Categories"
+  },
+  "trade": {
+    "instant_auto": "Instant Auto-Delivery",
+    "manual_p2p": "P2P Escrow Trade",
+    "buy": "Buy Now",
+    "price_per_unit": "Price per unit",
+    "available": "In Stock",
+    "min_order": "Min. Order",
+    "seller": "Seller",
+    "online": "Online",
+    "reviews": "reviews",
+    "server": "Server",
+    "side": "Faction / Side",
+    "amount": "Quantity",
+    "total": "Total Price",
+    "hold_notice": "Funds will be held securely in escrow until item is received"
+  },
+  "order": {
+    "title": "Trade Deal",
+    "status": {
+      "CREATED": "Created (Awaiting Payment)",
+      "PAID_HELD": "Paid (Funds held in Escrow)",
+      "TRANSFERRED_BY_SELLER": "Item transferred by seller",
+      "COMPLETED": "Deal successfully completed",
+      "DISPUTED": "Dispute opened (Arbitration)",
+      "REFUNDED": "Refunded"
+    },
+    "seller_action": "I transferred the item in-game/chat",
+    "buyer_action": "Confirm Receipt of Item",
+    "dispute_action": "Open Dispute",
+    "chat_placeholder": "Write a message to the seller...",
+    "send": "Send"
+  },
+  "wallet": {
+    "title": "Your Wallet",
+    "available": "Available Balance",
+    "frozen": "Frozen in Escrow",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw Funds",
+    "amount_label": "Amount (UAH)",
+    "deposit_mono": "Top up via Monobank / Apple Pay",
+    "withdraw_card": "Bank Card Number (IBAN)"
+  }
+}
