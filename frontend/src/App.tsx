@@ -30,8 +30,31 @@ export const App: React.FC = () => {
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
-  // Initial load
+  // Initial load & Telegram WebApp init
   useEffect(() => {
+    // Telegram WebApp setup
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg) {
+      try {
+        tg.ready();
+        tg.expand();
+        const tgUser = tg.initDataUnsafe?.user;
+        if (tgUser && !apiClient.getUser()) {
+          const username = tgUser.username || `tg_${tgUser.id}`;
+          apiClient.setUser({
+            userId: tgUser.id,
+            username: username,
+            email: `${username}@telegram.org`,
+            role: 'ROLE_USER',
+            telegramUsername: tgUser.username
+          });
+          setUser(apiClient.getUser());
+        }
+      } catch (err) {
+        console.warn('Telegram WebApp init warning:', err);
+      }
+    }
+
     const init = async () => {
       const cats = await apiClient.getCategories();
       setCategories(cats);

@@ -27,6 +27,99 @@ public class TelegramNotificationService {
     @Value("${app.telegram.bot-username:CyfraHubBot}")
     private String botUsername;
 
+    @Value("${app.public-url:https://cyfrahub-backend-production.up.railway.app}")
+    private String publicAppUrl;
+
+    @jakarta.annotation.PostConstruct
+    public void initBotMenuButton() {
+        try {
+            if (botToken == null || botToken.isBlank()) return;
+            String menuUrl = String.format("https://api.telegram.org/bot%s/setChatMenuButton", botToken);
+            String payload = String.format("""
+                {
+                    "menu_button": {
+                        "type": "web_app",
+                        "text": "🛍️ CyfraHub",
+                        "web_app": {
+                            "url": "%s"
+                        }
+                    }
+                }
+                """, publicAppUrl);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(menuUrl))
+                    .header("Content-Type", "application/json")
+                    .timeout(Duration.ofSeconds(5))
+                    .POST(HttpRequest.BodyPublishers.ofString(payload))
+                    .build();
+
+            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenAccept(res -> log.info("Telegram Mini App menu button setup: {}", res.body()))
+                    .exceptionally(ex -> {
+                        log.warn("Failed to configure Telegram menu button: {}", ex.getMessage());
+                        return null;
+                    });
+        } catch (Exception e) {
+            log.warn("Error setting Telegram menu button: {}", e.getMessage());
+        }
+    }
+
+    public void sendWelcomeWithWebApp(Long chatId, String text) {
+        try {
+            if (botToken == null || botToken.isBlank()) return;
+            String sendUrl = String.format("https://api.telegram.org/bot%s/sendMessage", botToken);
+            String payload = String.format("""
+                {
+                    "chat_id": %d,
+                    "text": "%s",
+                    "parse_mode": "Markdown",
+                    "reply_markup": {
+                        "inline_keyboard": [
+                            [
+                                {
+                                    "text": "🛍️ Відкрити CyfraHub Mini App",
+                                    "web_app": {
+                                        "url": "%s"
+                                    }
+                                }
+                            ],
+                            [
+                                {
+                                    "text": "🌐 Відкрити сайт маркетплейсу",
+                                    "url": "%s"
+                                }
+                            ]
+                        ]
+                    }
+                }
+                """, chatId, escapeJson(text), publicAppUrl, publicAppUrl);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(sendUrl))
+                    .header("Content-Type", "application/json")
+                    .timeout(Duration.ofSeconds(5))
+                    .POST(HttpRequest.BodyPublishers.ofString(payload))
+                    .build();
+
+            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenAccept(res -> log.info("Sent welcome with WebApp button to {}: {}", chatId, res.statusCode()))
+                    .exceptionally(ex -> {
+                        log.error("Failed to send welcome with WebApp to {}: {}", chatId, ex.getMessage());
+                        return null;
+                    });
+        } catch (Exception e) {
+            log.error("Error sending welcome with WebApp button: {}", e.getMessage());
+        }
+    }
+
+    private String escapeJson(String raw) {
+        return raw.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\n", "\\n")
+                  .replace("\r", "");
+    }
+
     public void notifyOrderCreated(Long telegramChatId, String orderNumber, String lotTitle, String amount) {
         if (telegramChatId == null) {
             log.info("No Telegram chatId configured for seller. Order #{}", orderNumber);

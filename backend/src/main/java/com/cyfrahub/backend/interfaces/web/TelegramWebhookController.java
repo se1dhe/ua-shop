@@ -53,14 +53,14 @@ public class TelegramWebhookController {
                                     user.setTelegramUsername(telegramUsername);
                                 }
                                 userRepository.save(user);
-                                telegramService.notifyNewChatMessage(chatId, "SYSTEM", "CyfraHub",
-                                        "✅ Ваш Telegram успішно прив'язано до акаунту " + user.getUsername() + "! Тепер ви отримуватимете всі сповіщення про угоди та повідомлення покупців сюди.");
+                                telegramService.sendWelcomeWithWebApp(chatId,
+                                        "✅ *Ваш Telegram успішно прив'язано до акаунту " + user.getUsername() + "!*\n\nТепер ви отримуватимете всі сповіщення про угоди та повідомлення сюди.\n\n👇 Натисніть кнопку нижче, щоб відкрити магазин прямо в Telegram:");
                                 return ResponseEntity.ok("OK");
                             }
                         } catch (NumberFormatException ignored) {}
                     }
-                    telegramService.notifyNewChatMessage(chatId, "SYSTEM", "CyfraHub",
-                            "👋 Вітаємо в CyfraHub — маркетплейсі цифрових та ігрових товарів!\nЩоб прив'язати акаунт, перейдіть у налаштування профілю в додатку або скористайтеся посиланням авторизації.");
+                    telegramService.sendWelcomeWithWebApp(chatId,
+                            "👋 *Вітаємо в CyfraHub!* 🎮\n\nУкраїнський маркетплейс цифрових товарів та ігрових цінностей (P2P Escrow захист):\n• 🪙 Ігрова валюта (WoW, Roblox, Brawl Stars)\n• 🛡️ Скіни та предмети (CS2, Dota 2)\n• 🔑 Ліцензійні ключі та софт\n• ⚡ Моментальна доставка та чат всередині угоди\n\n👇 *Натисніть кнопку нижче, щоб відкрити магазин:*");
                 }
             }
         } catch (Exception e) {
